@@ -1,14 +1,14 @@
 import argparse
 import os
 import shutil
-from langchain.document_loaders.pdf import PyPDFDirectoryLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from get_embedding_function import get_embedding_function
-from langchain.vectorstores.chroma import Chroma
+from langchain_chroma.vectorstores import Chroma
+from utils.document_loader import load_documents
 
 CHROMA_PATH = "chroma"
-DATA_PATH = "data"
+DATA_PATH = "data/books"
 
 def main():
 
@@ -17,19 +17,13 @@ def main():
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     args = parser.parse_args()
     if args.reset:
-        print("✨ Clearing Database")
+        print("Clearing Database")
         clear_database()
 
     # Create (or update) the data store.
     documents = load_documents()
     chunks = split_documents(documents)
     add_to_chroma(chunks)
-
-
-def load_documents():
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    return document_loader.load()
-
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
@@ -40,11 +34,12 @@ def split_documents(documents: list[Document]):
     )
     return text_splitter.split_documents(documents)
 
-
 def add_to_chroma(chunks: list[Document]):
     # Load the existing database.
     db = Chroma(
-        persist_directory=CHROMA_PATH, embedding_function=get_embedding_function()
+        collection_name="CybersecLLM",
+        persist_directory=CHROMA_PATH,
+        embedding_function=get_embedding_function()
     )
 
     # Calculate Page IDs.
@@ -62,17 +57,16 @@ def add_to_chroma(chunks: list[Document]):
             new_chunks.append(chunk)
 
     if len(new_chunks):
-        print(f"👉 Adding new documents: {len(new_chunks)}")
+        print(f"Adding new documents: {len(new_chunks)}")
         new_chunk_ids = [chunk.metadata["id"] for chunk in new_chunks]
         db.add_documents(new_chunks, ids=new_chunk_ids)
-        db.persist()
     else:
-        print("✅ No new documents to add")
+        print("No new documents to add")
 
 
 def calculate_chunk_ids(chunks):
 
-    # This will create IDs like "data/monopoly.pdf:6:2"
+    # This will create IDs like "data/generic_bookortext.pdf:6:2"
     # Page Source : Page Number : Chunk Index
 
     last_page_id = None

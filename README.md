@@ -1,26 +1,16 @@
-# Langchain RAG Tutorial
+# Langchain RAG Setup & Collaboration Guide 
+## Welcome cs team, please follow the following steps to setup the application.
 
 ## Install dependencies
 
-1. Do the following before installing the dependencies found in `requirements.txt` file because of current challenges installing `onnxruntime` through `pip install onnxruntime`. 
-
-    - For MacOS users, a workaround is to first install `onnxruntime` dependency for `chromadb` using:
-
-    ```python
-     conda install onnxruntime -c conda-forge
-    ```
-    See this [thread](https://github.com/microsoft/onnxruntime/issues/11037) for additonal help if needed. 
-
-     - For Windows users, follow the guide [here](https://github.com/bycloudai/InstallVSBuildToolsWindows?tab=readme-ov-file) to install the Microsoft C++ Build Tools. Be sure to follow through to the last step to set the enviroment variable path.
-
-
-2. Now run this command to install dependenies in the `requirements.txt` file. 
+1. Run this command to install dependenies in the `requirements.txt` file. 
 
 ```python
 pip install -r requirements.txt
 ```
+If any of the packages do not install, or throws errors, install them individually. Im sure you will figure it out.
 
-3. Install markdown depenendies with: 
+2. Install markdown depenendies with: 
 
 ```python
 pip install "unstructured[md]"
@@ -30,8 +20,10 @@ pip install "unstructured[md]"
 
 Create the Chroma DB.
 
+The command below will ingest the contents of the md file stored in the DATA_PATH = "data/books"
+
 ```python
-python create_database.py
+python populate_database.py
 ```
 
 ## Query the database
@@ -42,6 +34,11 @@ Query the Chroma DB.
 python query_data.py "How does Alice meet the Mad Hatter?"
 ```
 
-> You'll also need to set up an OpenAI account (and set the OpenAI key in your environment variable) for this to work.
+You'll also need to run ollama locally before running and of the python commands as this entire project runs locally, get the setup from the official page : https://ollama.com/. Once setup is completed, run the following commands in a terminal after closing any running instance of ollama.
+```ollama
+ollama pull llama3.1
+ollama pull nomic-embed-text
+ollama serve
+```
+>You are now good to run the python commands to create the database and query the LLM.
 
-Here is a step-by-step tutorial video: [RAG+Langchain Python Project: Easy AI/Chat For Your Docs](https://www.youtube.com/watch?v=tcqEUSNCn8I&ab_channel=pixegami).
