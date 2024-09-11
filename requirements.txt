@@ -7,11 +7,14 @@ onnxruntime==1.19.0 # chromadb dependency: on Mac use `conda install onnxruntime
 openai==1.31.1 # For embeddings
 tiktoken==0.7.0  # For embeddings 
 pypdf # Ingest PDF
-langchain 
+langchain
+langgraph
 chromadb # Vector storage
 langchain-chroma # Vector storage
 pytest # For unit testing ##Remove Maybe
 #boto3 # for AWS hosting if required ##Remove Maybe
 langchain-ollama # Ollama local embeddings
-
+markdown
+unstructured
+nltk
 # install markdown depenendies with: `pip install "unstructured[md]"` after install the requirements file. Leave this line commented out. 

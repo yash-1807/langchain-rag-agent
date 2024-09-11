@@ -40,5 +40,5 @@ python populate_database.py
 Query the Chroma DB.
 
 ```python
-python query_data.py "How does Alice meet the Mad Hatter?"
+python query_data.py "What is sqli?" or python primary_agent.py "Is the site xxx vulnerable?"
 ```

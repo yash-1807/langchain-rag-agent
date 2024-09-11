@@ -12,7 +12,7 @@ DATA_PATH = "data/books"
 
 def main():
 
-    # Check if the database should be cleared (using the --clear flag).
+    # Check if the database should be cleared (using the --reset flag).
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     args = parser.parse_args()
@@ -37,9 +37,7 @@ def split_documents(documents: list[Document]):
 def add_to_chroma(chunks: list[Document]):
     # Load the existing database.
     db = Chroma(
-        collection_name="CybersecLLM",
-        persist_directory=CHROMA_PATH,
-        embedding_function=get_embedding_function()
+        persist_directory=CHROMA_PATH, embedding_function=get_embedding_function()
     )
 
     # Calculate Page IDs.
@@ -53,6 +51,7 @@ def add_to_chroma(chunks: list[Document]):
     # Only add documents that don't exist in the DB.
     new_chunks = []
     for chunk in chunks_with_ids:
+        print(chunk.metadata["id"])
         if chunk.metadata["id"] not in existing_ids:
             new_chunks.append(chunk)
 
