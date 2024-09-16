@@ -10,7 +10,7 @@ from utils.document_loader import load_documents
 CHROMA_PATH = "chroma"
 DATA_PATH = "data/books"
 
-def main():
+def populate_database():
 
     # Check if the database should be cleared (using the --reset flag).
     parser = argparse.ArgumentParser()
@@ -95,7 +95,3 @@ def calculate_chunk_ids(chunks):
 def clear_database():
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH)
-
-
-if __name__ == "__main__":
-    main()
