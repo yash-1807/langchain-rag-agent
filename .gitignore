@@ -6,3 +6,4 @@ __pycache__
 tempKat.txt
 filterKat.txt
 data/books
+gradio_cached_examples

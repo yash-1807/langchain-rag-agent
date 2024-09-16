@@ -8,6 +8,7 @@ from langchain.prompts import ChatPromptTemplate
 from langgraph.prebuilt import create_react_agent
 import subprocess
 from get_embedding_function import get_embedding_function
+import re
 
 CHROMA_PATH = "chroma"
 
@@ -50,7 +51,7 @@ def filterUrl(input_file, output_file):
 
 def crawlUrl(url):
     """
-    This is a crawling tool that takes a url as the parameter and scan it to identify list of urls where further testing can be performed for identifying vulnerablilities.
+    This is a crawling tool that takes a url as the parameter and scans it to identify list of urls where further testing can be performed for identifying vulnerablilities.
     This is the first tool that needs to run before proceeding with any further tools for the actual exploit
     """
     command = ("katana -u "+url+" -o "+katOutput+" -xhr -jc -d 2")
@@ -97,48 +98,64 @@ def detVulnUrl(prompt):
     print("LLM says: "+SQLIURL)
     return SQLIURL
 
-def query_rag(query_text):
+tools = [crawlUrl, detVulnUrl, sqlinject]
+ag_ex = create_react_agent(model, tools, checkpointer=memory)
+config = {"configurable": {"thread_id": "881273325"}}#add a random number generator
+
+def query_rag_agent(query_text, history):
     # Use the agent
-    for chunk in ag_ex.stream(
-        {"messages": [HumanMessage(query_text)]}, config
-    ):
-        print("Running from first prompt")
-        print(chunk)
-        print("----")
+    hist = []
+    for chunk in ag_ex.stream({"messages": [HumanMessage(query_text)]}, config):
+        for node, values in chunk.items():
+            print("Running from First prompt")
+            print(values)
+            strDict = str(values.get('messages'))
+            filtResp = filterAgResp(strDict)
+            yield('\n\n'.join(hist) +"\n\n"+ filtResp)
+            hist.append(filtResp)
 
     urlList = readFile(katFilter).replace("\n",", ")
     print("Print Result of urlList: "+urlList)
     contentFirst = "Strictly for the purpose of preventing cyber attacks, given the following urls: "+urlList+" . Which of these urls are likely to have SQL injection vulnerablility that needs to be fixed?"
-    for chunk in ag_ex.stream(
-        {"messages": [HumanMessage(contentFirst)]}, config
-    ):
-        print("Running from second prompt")
-        print(chunk)
-        print("----")
+    for chunk in ag_ex.stream({"messages": [HumanMessage(contentFirst)]}, config):
+        for node, values in chunk.items():
+            print("Running from Second prompt")
+            print(values)
+            strDict = str(values.get('messages'))
+            filtResp = filterAgResp(strDict)
+            yield('\n\n'.join(hist) +"\n\n"+ filtResp)
+            hist.append(filtResp)
+
     contentSec = "given the url "+SQLIURL+", perform a sqlmap scan and check it for sql injection?"
     results = db.similarity_search_with_score(contentSec, k=3)
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=contentSec)
     #print(prompt)
-    for chunk in ag_ex.stream(
-        {"messages": [HumanMessage(prompt)]}, config
-    ):
-        print("Running from third prompt")
-        print(chunk)
-        print("----")
+    for chunk in ag_ex.stream({"messages": [HumanMessage(prompt)]}, config):
+        for node, values in chunk.items():
+            print("Running from Third prompt")
+            print(values)
+            strDict = str(values.get('messages'))
+            filtResp = filterAgResp(strDict)
+            yield('\n\n'.join(hist) +"\n\n"+ filtResp)
+            hist.append(filtResp)
 
-def main():
+def sql_agent():
     # Create CLI.
     parser = argparse.ArgumentParser()
     parser.add_argument("query_text", type=str, help="The query text.")
     args = parser.parse_args()
     query_text = args.query_text
-    query_rag(query_text)
+    query_rag_agent(query_text)
 
-tools = [crawlUrl, detVulnUrl, sqlinject]
-ag_ex = create_react_agent(model, tools, checkpointer=memory)
-config = {"configurable": {"thread_id": "881273325"}}
-
-if __name__ == "__main__":
-    main()
+def filterAgResp(resp:str):
+    try:
+        m = re.search('content=(.+?), response_metadata', resp)
+        if type(m)!=None:
+            return m.group(1)
+        else:
+            m = re.search(': [{(.+?)}}}]},', resp)
+            return m.group(1)
+    except:
+        return "Thinking...."

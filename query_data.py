@@ -18,7 +18,7 @@ Answer the question based on the above context: {question}
 """
 
 
-def main():
+def query_data():
     # Create CLI.
     parser = argparse.ArgumentParser()
     parser.add_argument("query_text", type=str, help="The query text.")
@@ -26,8 +26,12 @@ def main():
     query_text = args.query_text
     query_rag(query_text)
 
+def query_llm(query_text, history):
+    model = Ollama(model="llama3.1")
+    response_text = model.invoke(query_text)
+    return response_text
 
-def query_rag(query_text: str):
+def query_rag(query_text,history):
     # Prepare the DB.
     embedding_function = get_embedding_function()
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
@@ -47,7 +51,3 @@ def query_rag(query_text: str):
     formatted_response = f"Response: {response_text}\nSources: {sources}"
     print(formatted_response)
     return response_text
-
-
-if __name__ == "__main__":
-    main()
