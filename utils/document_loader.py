@@ -11,7 +11,7 @@ nltk.download('averaged_perceptron_tagger_eng')
 print("NLTK data downloaded.")
 
 # Define the data path
-DATA_PATH = r"E:\access_control\langchain-rag-agent\data\books"
+DATA_PATH = r"data\books"
 print(f"Using data path: {DATA_PATH}")
 
 # Define a dictionary to map file extensions to their respective loaders
