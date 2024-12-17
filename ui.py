@@ -1,46 +1,57 @@
 import gradio as gr
 from query_data import query_llm
 from query_data import query_rag
-from primary_agent import query_rag_agent
 
-basic = gr.ChatInterface(
-    query_llm,
-    chatbot=gr.Chatbot(height=300),
-    textbox=gr.Textbox(placeholder="Ask me any question.", container=False, scale=7),
-    title="SBI-CS-GPT 0.1",
-    description="Ask the LLM any question",
-    theme="soft",
-    examples=["What will you call an 8 legged human?", "Are tomatoes vegetables?"],
-    cache_examples=True,
-    retry_btn=None,
-    undo_btn="Delete Previous",
-    clear_btn="Clear",
-)
-rag = gr.ChatInterface(
-    query_rag,
-    chatbot=gr.Chatbot(height=300),
-    textbox=gr.Textbox(placeholder="Ask me a question which i have been taught.", container=False, scale=7),
-    title="SBI-CS-GPT 0.1",
-    description="Ask the LLM any question which it has been additionally trained on.",
-    theme="soft",
-    examples=["Tell me a basic sqlmap command to scan a site."],
-    cache_examples=True,
-    retry_btn=None,
-    undo_btn="Delete Previous",
-    clear_btn="Clear",
-)
-agent = gr.ChatInterface(
-    query_rag_agent,
-    chatbot=gr.Chatbot(height=300),
-    textbox=gr.Textbox(placeholder="Ask the agent to perform a task. (Only does sql injection for now)", container=False, scale=7),
-    title="SBI-CS-GPT 0.1",
-    description="Ask the agent to test on a site",
-    theme="soft",
-    undo_btn="Delete Previous",
-    clear_btn="Clear",
+def create_chat_interface(fn, placeholder, title, description, examples=None):
+    """
+    Function to create a professional and clean chat interface.
+    
+    Parameters:
+    - fn (function): The function to handle user queries.
+    - placeholder (str): Placeholder text for the input textbox.
+    - title (str): Title of the interface.
+    - description (str): Description of the interface.
+    - examples (list, optional): List of example queries for users.
+    
+    Returns:
+    - gr.Interface: The Gradio interface object.
+    """
+    return gr.Interface(
+        fn=fn,
+        inputs=[
+            gr.Radio(choices=["External", "Internal"], label="Select User Role"),
+            gr.Textbox(placeholder=placeholder, container=False, scale=7)
+        ],
+        outputs=gr.Chatbot(height=300, type="messages"),  # Updated to 'messages' format
+        title=title,
+        description=description,
+        theme="soft",
+        examples=examples,
+        cache_examples=True,
+        allow_flagging="never",  # Optional, can be removed if not needed
+    )
+
+# Creating interfaces with the provided functions and details
+basic_interface = create_chat_interface(
+    fn=query_llm,
+    placeholder="Ask me any question.",
+    title="SBI-CS-GPT 0.1 - Basic LLM",
+    description="Engage with the basic LLM model for general queries.",
+ 
 )
 
-demo = gr.TabbedInterface([basic, rag, agent], ["LLM BASIC", "LLM RAG", "LLM AGENT"])
+rag_interface = create_chat_interface(
+    fn=query_rag,
+    placeholder="Ask a question related to additional training data.",
+    title="SBI-CS-GPT 0.1 - RAG",
+    description="Interact with the LLM that incorporates retrieval-augmented generation (RAG).",
+    
+)
 
+# Combine all interfaces into a tabbed layout for easy navigation
+demo = gr.TabbedInterface([basic_interface, rag_interface], 
+                          ["LLM BASIC", "LLM RAG"])
+
+# Launch the application
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share=True)
