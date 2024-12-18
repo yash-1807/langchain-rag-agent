@@ -9,7 +9,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 from langchain_community.chat_models import ChatOllama
 
-BASE_URL = "https://119e-34-125-172-63.ngrok-free.app"
+BASE_URL = "https://6248-34-13-153-36.ngrok-free.app"
 MODEL = ChatOllama(model="llama3.1", base_url=BASE_URL)
 
 
@@ -179,22 +179,28 @@ def query_rag(user_role, query_text):
             {'role': 'user', 'content': query_text},
             {'role': 'assistant', 'content': f"Error: {e}"}]
 
-def query_llm(user_role,query_text):
-  
+def query_llm(query_text):
+
+    prompt=query_text
     response = ""
-    
-    for token in MODEL.invoke(query_text,stream=True):
+    print(prompt)
+
+    for token in MODEL.invoke(prompt, stream=True):
+        print(f"Token received: {token}")  # Debug statement to check the token
         if isinstance(token, tuple) and token[0] == 'content':
             token = token[1]  # Extract the actual content string
         else:
-            continue  # Skip non-content tokens
 
-        
+            continue  # Skip non-content tokens
 
         response += token  # Append the string content to the response
         yield [
             {'role': 'user', 'content': query_text},
             {'role': 'assistant', 'content': response}
         ]
+    
+    if not response:
+        print("No response generated.")  # Debug statement if response is empty
+
 if __name__ == "__main__":
     query_rag()

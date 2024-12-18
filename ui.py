@@ -31,8 +31,37 @@ def create_chat_interface(fn, placeholder, title, description, examples=None):
         allow_flagging="never",  # Optional, can be removed if not needed
     )
 
-# Creating interfaces with the provided functions and details
-basic_interface = create_chat_interface(
+
+
+def create_chat_interfacee(fn, placeholder, title, description, examples=None):
+    """
+    Function to create a professional and clean chat interface.
+    
+    Parameters:
+    - fn (function): The function to handle user queries.
+    - placeholder (str): Placeholder text for the input textbox.
+    - title (str): Title of the interface.
+    - description (str): Description of the interface.
+    - examples (list, optional): List of example queries for users.
+    
+    Returns:
+    - gr.Interface: The Gradio interface object.
+    """
+    return gr.Interface(
+        fn=fn,
+        inputs=gr.Textbox(placeholder=placeholder, container=False, scale=7),
+        outputs=gr.Chatbot(height=300, type="messages"),  # Updated to 'messages' format
+        title=title,
+        description=description,
+        theme="soft",
+        examples=examples,
+        cache_examples=True,
+        allow_flagging="never",  # Optional, can be removed if not needed
+    )
+
+
+# Call the original function if input is validg interfaces with the provided functions and details
+basic_interface = create_chat_interfacee(
     fn=query_llm,
     placeholder="Ask me any question.",
     title="SBI-CS-GPT 0.1 - Basic LLM",
