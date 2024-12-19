@@ -9,7 +9,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 from langchain_community.chat_models import ChatOllama
 
-BASE_URL = "<base_url>"
+BASE_URL = "https://012b-34-126-129-63.ngrok-free.app"
 MODEL = ChatOllama(model="llama3.1", base_url=BASE_URL)
 
 
