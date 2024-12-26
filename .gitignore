@@ -1,0 +1,9 @@
+.env
+chroma_*
+chroma
+.DS_Store
+__pycache__
+tempKat.txt
+filterKat.txt
+data/books
+gradio_cached_examples
