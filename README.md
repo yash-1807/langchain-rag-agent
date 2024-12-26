@@ -44,7 +44,7 @@ First of all to setup the server, create your account on ngrok and acquire the a
 ##### Install ollama and run
 
 ```
-curl -fsSL https://ollama.com/install.sh | sh
+curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION=0.4.7 sh
 
 ollama serve
 
