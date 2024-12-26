@@ -48,7 +48,7 @@ curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION=0.4.7 sh
 
 ollama serve
 
-Ollama run llama3.1
+ollama run llama3.1:8b-instruct-q2_K
 ```
 
 #### Install ngrok on code block
