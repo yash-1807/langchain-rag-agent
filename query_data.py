@@ -13,7 +13,7 @@ import os # Importing populate_database
 import shutil
 
 
-BASE_URL = "https://5ad8-34-125-91-148.ngrok-free.app"
+BASE_URL = "https://d7fb-35-240-191-15.ngrok-free.app"
 MODEL = ChatOllama(model="llama3.1:8b-instruct-q2_K", base_url=BASE_URL)
 
 

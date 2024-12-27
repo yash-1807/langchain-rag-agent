@@ -2,6 +2,7 @@ from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
+from langchain_community.document_loaders import UnstructuredExcelLoader
 import os
 import nltk
 
@@ -19,7 +20,8 @@ print(f"Using data path: {DATA_PATH}")
 LOADERS = {
     '.txt': TextLoader,
     '.csv': CSVLoader,
-    '.md': UnstructuredMarkdownLoader
+    '.md': UnstructuredMarkdownLoader,
+    '.xlsx':UnstructuredExcelLoader
 }
 
 def create_directory_loader(file_type, directory_path):
