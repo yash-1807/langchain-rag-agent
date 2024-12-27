@@ -8,7 +8,7 @@ from langchain_chroma.vectorstores import Chroma
 from utils.document_loader import load_documents
 
 CHROMA_PATH = "chroma"
-DATA_PATH = "data/books"
+DATA_PATH = r"E:\access_control\langchain-rag-agent\data\books"
 
 def populate_database():
     # Debugging: Start the population process

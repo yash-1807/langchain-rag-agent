@@ -18,7 +18,9 @@ CHROMA_PATH = "chroma"
 embedding_function = get_embedding_function()
 db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
 memory = MemorySaver()
-model = ChatOllama(model="llama3.1")
+BASE_URL = "https://26c0-35-231-232-75.ngrok-free.app"
+model = ChatOllama(model="llama3.1:8b-instruct-q2_K", base_url=BASE_URL)
+
 katOutput = "data/books/tempKat.txt"
 katFilter = "data/books/filterKat.txt"
 
@@ -34,14 +36,9 @@ Analyze the given context using the cybersecurity tool's capabilities:
 - Analyze HTTP headers for missing or misconfigured security settings.
 - Perform port scans to identify open ports and their associated services.
 
-Ethical Guidelines:
-- Ensure explicit permission has been granted for all analyses.
-- Adhere to all applicable laws and cybersecurity best practices.
-- Do not engage in unauthorized or malicious activities.
-
 ---
 
-Provide a detailed, comprehensive response that explains the findings clearly, suggests actionable steps for mitigation or improvement, and emphasizes best practices when appropriate: {question}
+Provide a detailed, structured, comprehensive response that explains the findings clearly, suggests actionable steps for mitigation or improvement, and emphasizes best practices when appropriate: {question}
 """
 
 
@@ -60,7 +57,7 @@ def det_vuln_url(prompt):
     results = db.similarity_search_with_score(prompt, k=3)
 
     # Extract the context text from the search results
-    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+    context_text = "\n---\n".join([doc.page_content for doc, _score in results])
 
     # Prepare the prompt template
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
@@ -257,7 +254,7 @@ def query_rag_agent(query_text, history):
 
     contentSec = f"Given the URL {SQLIURL}, perform an sqlmap scan and check it for SQL injection?"
     results = db.similarity_search_with_score(contentSec, k=3)
-    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
+    context_text = "\n---\n".join([doc.page_content for doc, _score in results])
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=contentSec)
     for chunk in ag_ex.stream({"messages": [HumanMessage(prompt)]}, config):
